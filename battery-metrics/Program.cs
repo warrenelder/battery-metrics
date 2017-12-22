@@ -1,4 +1,5 @@
 ﻿using System;
+using batterymetrics.Controller;
 
 namespace battery_metrics
 {
@@ -6,7 +7,20 @@ namespace battery_metrics
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            string path;
+            ConsoleController cc = new ConsoleController();
+
+            // Console prompt text
+            Console.WriteLine("Please provide file path;");
+
+            // Upload file (provide file path)
+            path = Console.ReadLine();
+            cc.Read(path);
+
+            // Calculate Metrics
+
+            // Output metrics
+
         }
     }
 }
