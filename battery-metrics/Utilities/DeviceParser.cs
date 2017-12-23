@@ -4,7 +4,7 @@ using batterymetrics.Model;
 
 namespace batterymetrics.Utilities
 {
-    public class DeviceParser
+    public static class DeviceParser
     {
         public static Device FromTsv(string tsvLine)
         {
