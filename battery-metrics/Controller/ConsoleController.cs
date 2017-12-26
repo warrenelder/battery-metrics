@@ -5,12 +5,14 @@ using batterymetrics.Utilities;
 using static Newtonsoft.Json.JsonConvert;
 using batterymetrics.Model;
 using System.Collections.Generic;
+using CsvHelper;
 
 namespace batterymetrics.Controller
 {
     public class ConsoleController
     {
         private static List<Device> _devices = new List<Device>();
+        private static List<DeviceData> _deviceData = new List<DeviceData>();
         private static List<Metric> _metrics = new List<Metric>();
         private static List<Cycle> _cycles = new List<Cycle>();
 
@@ -21,37 +23,27 @@ namespace batterymetrics.Controller
 
         public void Analyse()
         {
-            var groupedDevices = _devices.GroupBy(d => d.deviceId).ToList();
-            foreach (var _device in groupedDevices)
-            {
-                int count = 0;
-                var deviceId = _device.Key;
-                Console.WriteLine(deviceId + " device id");
-                var test = _device.OrderBy(t => t.timestamp);
-                foreach(var _reading in _device) 
-                {
-                    count++;
-                    var deviceData = DeserializeObject<DeviceData>(_reading.jsonData);
-
-                    Console.WriteLine(_reading.timestamp);
-                    Console.WriteLine(deviceData.Battery.charging);
-                    Console.WriteLine(deviceData.Battery.level);
-
-                }
-
-                // Metric calculation
-            }
+            //@TODO Calculate battery metrics for each device
         }
 
         public void View()
         {
-            
+            Console.Write($"DeviceId AccNum BattLife Chargetime Cycles \n");
+            foreach (var metric in _metrics)
+            {
+                Console.Write($"{metric.DeviceId} \t {metric.AccNum} \t {metric.BatteryLifetime} \t {metric.ChargeTime} \t {metric.Cycles} \n");
+            }
         }
 
         public void Create()
         {
-            
+            using (var writer = new StreamWriter("output.csv"))
+            {
+                using (var csvWriter = new CsvWriter(writer))
+                {
+                    csvWriter.WriteRecords(_metrics);
+                }
+            }
         }
-
     }
 }
