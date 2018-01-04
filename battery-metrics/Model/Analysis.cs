@@ -13,18 +13,8 @@ namespace batterymetrics.Model
 
     public class Cycle
     { 
-        public int DeviceId { get; set; }
-        public int AccNum { get; set; }
         public bool Charging { get; set; }
         public double PredHalfCycleTime { get; set; }
     }
 
-    public class Processor
-    {
-        public int DeviceId { get; set; }
-        public int AccountId { get; set; }
-        public DateTime Timestamp { get; set; }
-        public int level { get; set; }
-        public bool charging { get; set; }
-    }
 }

@@ -21,50 +21,38 @@ namespace batterymetrics.Controller
 
         public void Analyse()
         {
-            
-            foreach (var _device in _devices.GroupBy(d => d.deviceId).ToList())
-            {
-                List<Processor> _processor = new List<Processor>();
-                List<Cycle> _cycles = new List<Cycle>();
-                var _deviceId = _device.Key;
-                var _accNum = _device.Select(x => x.accntNo).FirstOrDefault();
 
-                // Deserialise json data in device
-                foreach (var _reading in _device.OrderBy(t => t.timestamp).ToList())
-                {
-                    var data = DeserializeObject<DeviceData>(_reading.jsonData);
-                    _processor.Add(
-                        new Processor()
-                        {
-                            DeviceId = _reading.deviceId,
-                            AccountId = _reading.accntNo,
-                            Timestamp = _reading.timestamp,
-                            level = data.Battery.level,
-                            charging = data.Battery.charging
-                        });
-                }
+            // Extract device JSON data
+            var collection = _devices.Select(c => new { c.deviceId, c.accntNo, c.timestamp, batteryData = Device.ExtractJSON(c).Battery}).ToList();
+
+            // Calculate device metrics
+            foreach (var _deviceReadings in collection.OrderBy(x => x.timestamp).GroupBy(x => x.deviceId).ToList())
+            {
+                List<Cycle> _cycles = new List<Cycle>();
+                var _deviceId = _deviceReadings.Key;
+                var _accNum = _deviceReadings.Select(x => x.accntNo).FirstOrDefault();
 
                 // Process device cycles
                 Dictionary<int, int> _cycleIndex = new Dictionary<int, int>();
                 int cycle = 0;
-                for (int i = 0; i < _processor.Count(); i++)
+                for (int i = 0; i < _deviceReadings.Count(); i++)
                 {
-                    var cData = _processor[i];
+                    var cData = _deviceReadings.ToList()[i];
                     if (i == 0)
                     {
                         cycle++;
                     }
                     else
                     {
-                        var pData = _processor[i - 1];
-                        if ((cData.charging != pData.charging))
+                        var pData = _deviceReadings.ToList()[i - 1];
+                        if ((cData.batteryData.charging != pData.batteryData.charging))
                         {
                             cycle++;
                         }
                         else
                         {
-                            if ((cData.charging && (cData.level < pData.level)) ||
-                               (!cData.charging && (cData.level > pData.level)))
+                            if ((cData.batteryData.charging && (cData.batteryData.level < pData.batteryData.level)) ||
+                                (!cData.batteryData.charging && (cData.batteryData.level > pData.batteryData.level)))
                             {
                                 cycle++;
                             }
@@ -73,17 +61,17 @@ namespace batterymetrics.Controller
                     _cycleIndex.Add(cData.GetHashCode(), cycle);
                 }
 
-                foreach (var item in _processor.Join(_cycleIndex,
+                foreach (var item in _deviceReadings.Join(_cycleIndex,
                                         (p) => p.GetHashCode(),
                                         (f) => f.Key,
-                                        (p, f) => new { p.DeviceId, p.AccountId, p.Timestamp, p.charging, p.level, cycle = f.Value })
+                                        (p, f) => new { p.deviceId, p.accntNo, p.timestamp, p.batteryData.charging, p.batteryData.level, cycle = f.Value })
                                   .GroupBy((arg) => arg.cycle)
                                   .ToList())
                 {
 
                     var start = item.First();
                     var end = item.Last();
-                    double deltaTime = (end.Timestamp - start.Timestamp).TotalSeconds;
+                    double deltaTime = (end.timestamp - start.timestamp).TotalSeconds;
                     double deltaLevel = Math.Abs(end.level - start.level);
                     double _PredHalfCycleTime = 0;
                     if (deltaTime > 0 && deltaLevel > 0)
@@ -93,8 +81,6 @@ namespace batterymetrics.Controller
 
                     _cycles.Add(new Cycle()
                     {
-                        DeviceId = start.DeviceId,
-                        AccNum = start.AccountId,
                         Charging = start.charging,
                         PredHalfCycleTime = _PredHalfCycleTime,
                     });
