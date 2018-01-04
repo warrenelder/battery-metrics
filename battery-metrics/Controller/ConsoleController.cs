@@ -28,11 +28,12 @@ namespace batterymetrics.Controller
             // Calculate device metrics
             foreach (var _deviceReadings in collection.OrderBy(x => x.timestamp).GroupBy(x => x.deviceId).ToList())
             {
-                List<Cycle> _cycles = new List<Cycle>();
+                
                 var _deviceId = _deviceReadings.Key;
                 var _accNum = _deviceReadings.Select(x => x.accntNo).FirstOrDefault();
 
-                // Process device cycles
+                // TODO refactor charge cycle analysis into seperate class
+                // Generate charging cycle index
                 Dictionary<int, int> _cycleIndex = new Dictionary<int, int>();
                 int cycle = 0;
                 for (int i = 0; i < _deviceReadings.Count(); i++)
@@ -61,6 +62,8 @@ namespace batterymetrics.Controller
                     _cycleIndex.Add(cData.GetHashCode(), cycle);
                 }
 
+                // Predict charge/discharge time for each cycle
+                List<Cycle> _cycles = new List<Cycle>();
                 foreach (var item in _deviceReadings.Join(_cycleIndex,
                                         (p) => p.GetHashCode(),
                                         (f) => f.Key,
