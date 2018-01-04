@@ -1,4 +1,5 @@
 ﻿using System;
+using static Newtonsoft.Json.JsonConvert;
 namespace batterymetrics.Model
 {
     public class Device
@@ -7,6 +8,11 @@ namespace batterymetrics.Model
         public int accntNo { get; set; }
         public DateTime timestamp { get; set; } 
         public string jsonData { get; set; }
+
+        public static DeviceData ExtractJSON(Device item)
+        {
+            return DeserializeObject<DeviceData>(item.jsonData);
+        }
     }
 
     public class DeviceData
