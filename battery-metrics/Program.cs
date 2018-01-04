@@ -7,19 +7,23 @@ namespace battery_metrics
     {
         static void Main(string[] args)
         {
-            string path;
             ConsoleController cc = new ConsoleController();
 
             // Console prompt text
-            Console.WriteLine("Please provide file path;");
+            Console.WriteLine("Please provide upload file path;");
 
             // Upload file (provide file path)
             path = Console.ReadLine();
             cc.Read(path);
 
             // Calculate Metrics
+            cc.Analyse();
 
             // Output metrics
+            cc.View();
+
+            // Output file
+            cc.Create();
 
         }
     }
