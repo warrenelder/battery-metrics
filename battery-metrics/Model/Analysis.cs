@@ -8,6 +8,7 @@ namespace batterymetrics.Model
         public int BatteryLifetime { get; set; }
         public int ChargeTime { get; set; }
         public int Cycles { get; set; }
+        public int LevelCycles { get; set; }
     }
 
     public class Cycle
@@ -15,7 +16,7 @@ namespace batterymetrics.Model
         public int DeviceId { get; set; }
         public int AccNum { get; set; }
         public bool Charging { get; set; }
-        public double Rate { get; set; }
+        public double PredHalfCycleTime { get; set; }
     }
 
     public class Processor
