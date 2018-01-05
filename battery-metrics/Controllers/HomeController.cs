@@ -111,6 +111,13 @@ namespace battery_metrics.Controllers
             return View();
         }
 
+        public IActionResult Reset()
+        {
+            _metrics.Clear();
+            _devices.Clear();
+            return RedirectToAction("Index");
+        }
+
         //[HttpGet("{id}")]
         //public IActionResult ViewMetric(int id)
         //{
