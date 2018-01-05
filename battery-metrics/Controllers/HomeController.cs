@@ -18,9 +18,12 @@ namespace battery_metrics.Controllers
 
         private static List<Device> _devices = new List<Device>();
         private static List<Metric> _metrics = new List<Metric>();
+        //private static string _email;
 
         public IActionResult Index()
         {
+            // TODO This needs to be refactored into seperate method/class
+
             // Extract device JSON data
             var collection = _devices.Select(c => new { c.deviceId, c.accntNo, c.timestamp, batteryData = Device.ExtractJSON(c).Battery }).ToList();
 
@@ -101,6 +104,11 @@ namespace battery_metrics.Controllers
                 ViewData["Message"] = "Please upload device data to view battery metrics.";
 
             return View(_metrics);
+        }
+
+        public IActionResult Add()
+        {
+            return View();
         }
 
         //[HttpGet("{id}")]
