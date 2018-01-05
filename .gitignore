@@ -40,3 +40,5 @@ Thumbs.db
 *.dotCover
 
 battery-metrics/testdata\.txt
+
+battery-metrics/wwwroot/testdata\.txt
