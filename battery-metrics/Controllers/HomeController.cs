@@ -29,7 +29,7 @@ namespace battery_metrics.Controllers
             EnableSsl = true,
             DeliveryMethod = SmtpDeliveryMethod.Network,
             UseDefaultCredentials = false,
-            Credentials = new NetworkCredential("ENTER GMAIL EMAIL", "ENTER GMAIL APP PASsWORD")
+            Credentials = new NetworkCredential("ENTER GMAIL EMAIL", "ENTER GMAIL APP PASSWORD")
         };
 
         public IActionResult Index()
@@ -63,7 +63,7 @@ namespace battery_metrics.Controllers
         public IActionResult SendEmail([FromForm] User user)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(ModelState); // TODO Return appropriate error message to form
         
             var fromAddress = new MailAddress("noreplay@batterymetrics.net", "Battery Metrics");
             var toAddress = new MailAddress(user.Email, "To Name");
@@ -77,17 +77,16 @@ namespace battery_metrics.Controllers
                 using (var csvWriter = new CsvWriter(writer))
                 using (var message = new MailMessage(fromAddress, toAddress) { Subject = subject, Body = body })
                 {
-                    
                     csvWriter.WriteRecords(_metrics);
                     writer.Flush();
                     stream.Position = 0;
-                    message.Attachments.Add(new Attachment(stream, "filename.csv", "text/csv"));
+                    message.Attachments.Add(new Attachment(stream, "batterymetrics.csv", "text/csv"));
                     smtp.Send(message);
                 }
             }
             catch
             {
-                Redirect("Email");
+                Redirect("Email"); // TODO Return appropriate error message to form
             }
 
             return RedirectToAction("Index");
@@ -99,7 +98,7 @@ namespace battery_metrics.Controllers
             var result = new List<string>();
             
             if (file == null || file.Length == 0)
-                return Content("file not selected");
+                return Content("file not selected"); // TODO Return appropriate error message to form
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FileName);
 
