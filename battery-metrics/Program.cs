@@ -1,26 +1,25 @@
 ﻿using System;
-using batterymetrics.Controller;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace battery_metrics
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            string path;
-            ConsoleController cc = new ConsoleController();
-
-            // Console prompt text
-            Console.WriteLine("Please provide file path;");
-
-            // Upload file (provide file path)
-            path = Console.ReadLine();
-            cc.Read(path);
-
-            // Calculate Metrics
-
-            // Output metrics
-
+            BuildWebHost(args).Run();
         }
+
+        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .Build();
     }
 }
