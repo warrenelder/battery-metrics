@@ -11,17 +11,11 @@
     <div class="col-md-4 col-lg-12">
         <form asp-controller="Home" asp-action="UploadFile" method="post" enctype="multipart/form-data">
             <div class="form-group inline">
-                <label class="control-label">Email</label>
-                <input name="email" type="email" class="form-control" />
-            </div>
-            <div class="form-group inline">
                 <label class="control-label">File</label>
                 <input name="file" type="file" class="form-control" style="height:auto" />
             </div>
+            <a class="btn btn-primary inline" asp-controller="Home" asp-action="Index">Back</a>
             <input type="submit" value="Upload" class="btn btn-default inline" />
         </form>
     </div>
 </div>
-
-<a class="btn btn-primary" asp-controller="Home" asp-action="Index">Back</a>
-

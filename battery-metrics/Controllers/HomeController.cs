@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using battery_metrics.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using batterymetrics.Model;
+using batterymetrics.Models;
 using batterymetrics.Utilities;
 using System.Collections.ObjectModel;
+using System.Net;
+using System.Net.Mail;
+using CsvHelper;
+using System.Net.Mime;
 
 namespace battery_metrics.Controllers
 {
@@ -18,10 +22,95 @@ namespace battery_metrics.Controllers
 
         private static List<Device> _devices = new List<Device>();
         private static List<Metric> _metrics = new List<Metric>();
-        //private static string _email;
+        private static SmtpClient smtp = new SmtpClient
+        {
+            Host = "smtp.gmail.com",
+            Port = 587,
+            EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            UseDefaultCredentials = false,
+            Credentials = new NetworkCredential("ENTER GMAIL EMAIL", "ENTER GMAIL APP PASsWORD")
+        };
 
         public IActionResult Index()
         {
+            if (_metrics.Count() == 0)
+                ViewData["Message"] = "Please upload device data to view battery metrics.";
+
+            return View(_metrics);
+        }
+
+        [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Email()
+        {
+            return View();
+        }
+
+        public IActionResult Reset()
+        {
+            _metrics.Clear();
+            _devices.Clear();
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult SendEmail([FromForm] User user)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+        
+            var fromAddress = new MailAddress("noreplay@batterymetrics.net", "Battery Metrics");
+            var toAddress = new MailAddress(user.Email, "To Name");
+            const string subject = "Battery Metrics";
+            const string body = "Analysis of device data upload is attached as a csv file.";
+
+            try
+            {
+                using (var stream = new MemoryStream())
+                using (var writer = new StreamWriter(stream))    // using UTF-8 encoding by default
+                using (var csvWriter = new CsvWriter(writer))
+                using (var message = new MailMessage(fromAddress, toAddress) { Subject = subject, Body = body })
+                {
+                    
+                    csvWriter.WriteRecords(_metrics);
+                    writer.Flush();
+                    stream.Position = 0;
+                    message.Attachments.Add(new Attachment(stream, "filename.csv", "text/csv"));
+                    smtp.Send(message);
+                }
+            }
+            catch
+            {
+                Redirect("Email");
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult UploadFile(IFormFile file)
+        {
+            var result = new List<string>();
+            
+            if (file == null || file.Length == 0)
+                return Content("file not selected");
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FileName);
+
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                while (reader.Peek() > 0)
+                    result.Add(reader.ReadLine());
+            }              
+
+            _devices.AddRange(result.Skip(1).Select(x => DeviceParser.FromTsv(x)));
+
             // TODO This needs to be refactored into seperate method/class
 
             // Extract device JSON data
@@ -99,59 +188,6 @@ namespace battery_metrics.Controllers
                     LevelCycles = _cycles.Where(x => (int)x.PredHalfCycleTime == 0).Count(),
                 });
             }
-
-            if (_metrics.Count() == 0)
-                ViewData["Message"] = "Please upload device data to view battery metrics.";
-
-            return View(_metrics);
-        }
-
-        public IActionResult Add()
-        {
-            return View();
-        }
-
-        public IActionResult Reset()
-        {
-            _metrics.Clear();
-            _devices.Clear();
-            return RedirectToAction("Index");
-        }
-
-        //[HttpGet("{id}")]
-        //public IActionResult ViewMetric(int id)
-        //{
-        //    var metric = _metrics.SingleOrDefault(p => p.DeviceId == id);
-
-        //    if (metric == null)
-        //        return NotFound();
-
-        //    return View(metric);
-        //}
-
-        [HttpPost]
-        public IActionResult ViewMetric()
-        {
-            return View(_metrics);
-        }
-
-        [HttpPost]
-        public IActionResult UploadFile(IFormFile file)
-        {
-            var result = new List<string>();
-            
-            if (file == null || file.Length == 0)
-                return Content("file not selected");
-
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file.FileName);
-
-            using (var reader = new StreamReader(file.OpenReadStream()))
-            {
-                while (reader.Peek() > 0)
-                    result.Add(reader.ReadLine());
-            }              
-
-            _devices.AddRange(result.Skip(1).Select(x => DeviceParser.FromTsv(x)));
 
             return RedirectToAction("Index");
         }

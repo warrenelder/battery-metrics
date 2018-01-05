@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using batterymetrics.Model;
+using batterymetrics.Models;
 
 namespace batterymetrics.Utilities
 {

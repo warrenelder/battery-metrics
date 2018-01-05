@@ -1,6 +1,6 @@
 ﻿using System;
 using static Newtonsoft.Json.JsonConvert;
-namespace batterymetrics.Model
+namespace batterymetrics.Models
 {
     public class Device
     {

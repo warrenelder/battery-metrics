@@ -1,0 +1,25 @@
+﻿@model batterymetrics.Models.User
+@{
+    ViewData["Title"] = "Send Data";
+}
+<div class="row">
+    <div class="col-md-4">
+        <h3>@ViewData["Title"]</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 col-lg-12">
+        <form asp-controller="Home" asp-action="SendEmail" method="post" enctype="multipart/form-data">
+            <div class="form-group inline">
+                <label class="control-label">Email</label>
+                <input asp-for="@Model.Email" class="form-control" />
+                <span asp-validation-for="@Model.Email"></span>
+            </div>
+            <a class="btn btn-primary inline" asp-controller="Home" asp-action="Index">Back</a>
+            <input type="submit" value="Email" class="btn btn-default inline" />
+        </form>
+    </div>
+</div>
+
+
