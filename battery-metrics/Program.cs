@@ -13,7 +13,7 @@ namespace battery_metrics
             Console.WriteLine("Please provide upload file path;");
 
             // Upload file (provide file path)
-            path = Console.ReadLine();
+            string path = Console.ReadLine();
             cc.Read(path);
 
             // Calculate Metrics
