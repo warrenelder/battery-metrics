@@ -1,19 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using battery_metrics.Models;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using batterymetrics.Models;
-using batterymetrics.Utilities;
-using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Mail;
 using CsvHelper;
-using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using batterymetrics.Models;
+using batterymetrics.Utilities;
+
 
 namespace battery_metrics.Controllers
 {
