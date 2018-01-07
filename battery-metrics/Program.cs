@@ -14,7 +14,7 @@ namespace battery_metrics
 
             while (File.Exists(filename) != true)
             {
-                Console.WriteLine("Please provide upload file path;");
+                Console.WriteLine("Please provide upload filename");
                 filename = Console.ReadLine();
             }
 
