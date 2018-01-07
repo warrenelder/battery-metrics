@@ -11,7 +11,14 @@ This project has two branches; *master* - which contains the console application
 Each application can be run from cmd line.
 
 $ cd /battery-metrics/battery-metrics
+
 $ dotnet run
+
+**Console App**
+
+This prompts you for a filename eg testdata.txt which must be located in "battery-metrics/battery-metrics" directory.
+
+**Web App**
 
 The web app can send emails, but the smpt server must be setup. I have utilised Gmail's SmtpClient to send emails.
 To setup go to the *HomeController* and edit the following code;
