@@ -1,12 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using batterymetrics.Utilities;
+﻿using batterymetrics.Utilities;
 using static Newtonsoft.Json.JsonConvert;
 using batterymetrics.Model;
 using System.Collections.Generic;
-using CsvHelper;
-using MoreLinq;
+
 namespace batterymetrics.Components
 {
     public class DeviceFactory

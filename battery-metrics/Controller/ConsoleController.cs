@@ -18,10 +18,6 @@ namespace batterymetrics.Controller
         {
             try
             {
-                //StreamReader sr = File.OpenText(filename);
-                //Console.WriteLine("The first line of this file is {0}", sr.ReadLine());
-                //sr.ReadToEnd().Skip(1).Select(x=>DeviceFactory.AddDeviceReading(x));
-                //sr.Close();
                 foreach( var reading in File.ReadAllLines(filename).Skip(1) )
                 {
                     DeviceFactory.AddDevice(reading);
@@ -37,7 +33,6 @@ namespace batterymetrics.Controller
         {
             Console.Write($"DeviceId  AccNum  BattLife  ChargeT  Cycles  FlatCycles \n");
 
-            // Implement foreach loop to output each metric then provide download.
             foreach (var item in DeviceFactory.DeviceList.DistinctBy(x => x.deviceId).ToList())
             {
                 Metric DeviceMetric = MetricFactory.DeviceBatteryMetric(item.deviceId, item.accntNo);

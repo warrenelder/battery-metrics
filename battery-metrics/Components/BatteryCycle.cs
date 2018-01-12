@@ -16,7 +16,7 @@ namespace batterymetrics.Components
         public static List<Cycle> CalculateDeviceBatteryChargeCycle(int DeviceID)
         {
             List<Cycle> CycleList = new List<Cycle>();
-            // Get all readings from device id
+
             var DeviceReadings = DeviceFactory
                 .DeviceList
                 .Where(x => x.deviceId == DeviceID)
@@ -27,8 +27,7 @@ namespace batterymetrics.Components
                     batteryData = DeviceFactory.ExtractJSON(x).Battery
                 })
                 .ToList();
-
-            // Get an index of each Charge cycle
+            
             var DeviceReadingCycleIndex = CreateChargeCycleIndex(DeviceID);
 
             var GroupedDeviceReadingByCycle = DeviceReadings
@@ -46,7 +45,7 @@ namespace batterymetrics.Components
                         .GroupBy(x => x.Cycle)
                         .Select(g => g.ToList())
                 .ToList();
-            // Predict charge/discharge time for each cycle
+            
             foreach (var CycleGroup in GroupedDeviceReadingByCycle)
             {
                 var FirstReading = CycleGroup.First();
