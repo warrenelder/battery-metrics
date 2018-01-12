@@ -11,6 +11,7 @@ namespace batterymetrics.Utilities
             char[] quotes = { '\"', ' ' };
             string[] values = tsvLine.Split('\t');
 
+
             Device device = new Device
             {
                 deviceId = int.Parse(values[0]),

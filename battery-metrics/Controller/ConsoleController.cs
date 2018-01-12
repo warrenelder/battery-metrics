@@ -1,125 +1,62 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using batterymetrics.Utilities;
-using static Newtonsoft.Json.JsonConvert;
-using batterymetrics.Model;
 using System.Collections.Generic;
 using CsvHelper;
+using MoreLinq;
+using batterymetrics.Model;
+using batterymetrics.Components;
 
 namespace batterymetrics.Controller
 {
     public class ConsoleController
     {
-        private static List<Device> _devices = new List<Device>();
-        private static List<Metric> _metrics = new List<Metric>();
+        
+        private static List<Metric> DeviceMetricList = new List<Metric>();
 
-        public void Read(string path)
+        public void Read(string filename)
         {
-            _devices.AddRange(File.ReadAllLines(path).Skip(1).Select(l => DeviceParser.FromTsv(l)));
-        }
-
-        public void Analyse()
-        {
-
-            // Extract device JSON data
-            var collection = _devices.Select(c => new { c.deviceId, c.accntNo, c.timestamp, batteryData = Device.ExtractJSON(c).Battery}).ToList();
-
-            // Calculate device metrics
-            foreach (var _deviceReadings in collection.OrderBy(x => x.timestamp).GroupBy(x => x.deviceId).ToList())
+            try
             {
-                
-                var _deviceId = _deviceReadings.Key;
-                var _accNum = _deviceReadings.Select(x => x.accntNo).FirstOrDefault();
-
-                // TODO refactor charge cycle analysis into seperate class
-                // Generate charging cycle index
-                Dictionary<int, int> _cycleIndex = new Dictionary<int, int>();
-                int cycle = 0;
-                for (int i = 0; i < _deviceReadings.Count(); i++)
+                //StreamReader sr = File.OpenText(filename);
+                //Console.WriteLine("The first line of this file is {0}", sr.ReadLine());
+                //sr.ReadToEnd().Skip(1).Select(x=>DeviceFactory.AddDeviceReading(x));
+                //sr.Close();
+                foreach( var reading in File.ReadAllLines(filename).Skip(1) )
                 {
-                    var cData = _deviceReadings.ToList()[i];
-                    if (i == 0)
-                    {
-                        cycle++;
-                    }
-                    else
-                    {
-                        var pData = _deviceReadings.ToList()[i - 1];
-                        if ((cData.batteryData.charging != pData.batteryData.charging))
-                        {
-                            cycle++;
-                        }
-                        else
-                        {
-                            if ((cData.batteryData.charging && (cData.batteryData.level < pData.batteryData.level)) ||
-                                (!cData.batteryData.charging && (cData.batteryData.level > pData.batteryData.level)))
-                            {
-                                cycle++;
-                            }
-                        }
-                    }
-                    _cycleIndex.Add(cData.GetHashCode(), cycle);
-                }
-
-                // Predict charge/discharge time for each cycle
-                List<Cycle> _cycles = new List<Cycle>();
-                foreach (var item in _deviceReadings.Join(_cycleIndex,
-                                        (p) => p.GetHashCode(),
-                                        (f) => f.Key,
-                                        (p, f) => new { p.deviceId, p.accntNo, p.timestamp, p.batteryData.charging, p.batteryData.level, cycle = f.Value })
-                                  .GroupBy((arg) => arg.cycle)
-                                  .ToList())
-                {
-
-                    var start = item.First();
-                    var end = item.Last();
-                    double deltaTime = (end.timestamp - start.timestamp).TotalSeconds;
-                    double deltaLevel = Math.Abs(end.level - start.level);
-                    double _PredHalfCycleTime = 0;
-                    if (deltaTime > 0 && deltaLevel > 0)
-                    {
-                        _PredHalfCycleTime = (deltaTime / deltaLevel) * 100;
-                    }
-
-                    _cycles.Add(new Cycle()
-                    {
-                        Charging = start.charging,
-                        PredHalfCycleTime = _PredHalfCycleTime,
-                    });
-                }
-
-                // Calculate battery metrics
-                _metrics.Add(new Metric()
-                {
-                    DeviceId = _deviceId,
-                    AccNum = _accNum,
-                    BatteryLifetime = (int)_cycles.Where(x => x.Charging == false && x.PredHalfCycleTime > 0).Select(x => (int?)Math.Round(x.PredHalfCycleTime)).Average().GetValueOrDefault(),
-                    ChargeTime = (int)_cycles.Where(x => x.Charging == true && x.PredHalfCycleTime > 0).Select(x => (int?)Math.Round(x.PredHalfCycleTime)).Average().GetValueOrDefault(),
-                    Cycles = _cycles.Count(),
-                    LevelCycles = _cycles.Where(x => (int)x.PredHalfCycleTime == 0).Count(),
-                });
-
+                    DeviceFactory.AddDevice(reading);
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error reading the file: '{0}'", ex);
             }
         }
 
         public void View()
         {
             Console.Write($"DeviceId  AccNum  BattLife  ChargeT  Cycles  FlatCycles \n");
-            foreach (var metric in _metrics)
+
+            // Implement foreach loop to output each metric then provide download.
+            foreach (var item in DeviceFactory.DeviceList.DistinctBy(x => x.deviceId).ToList())
             {
-                string output = $"{metric.DeviceId,-10}{metric.AccNum,-8}{metric.BatteryLifetime,-10}{metric.ChargeTime,-9}{metric.Cycles,-9}{metric.LevelCycles,-8}\n";
+                Metric DeviceMetric = MetricFactory.DeviceBatteryMetric(item.deviceId, item.accntNo);
+                string output = $"{DeviceMetric.DeviceId,-10}{DeviceMetric.AccNum,-8}{DeviceMetric.BatteryLifetime,-10}{DeviceMetric.ChargeTime,-9}{DeviceMetric.Cycles,-9}{DeviceMetric.LevelCycles,-8}\n";
                 Console.Write(output);
             }
         }
 
         public void Create()
         {
+            foreach (var item in DeviceFactory.DeviceList.DistinctBy(x => x.deviceId).ToList())
+            {
+                DeviceMetricList.Add(MetricFactory.DeviceBatteryMetric(item.deviceId, item.accntNo));
+            }
             using (var writer = new StreamWriter("output.csv"))
             {
                 using (var csvWriter = new CsvWriter(writer))
                 {
-                    csvWriter.WriteRecords(_metrics);
+                    csvWriter.WriteRecords(DeviceMetricList);
                 }
             }
         }

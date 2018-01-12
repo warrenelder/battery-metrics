@@ -21,10 +21,7 @@ namespace battery_metrics
             // Upload file (provide file path)
             cc.Read(filename);
 
-            // Calculate Metrics
-            cc.Analyse();
-
-            // Output metrics
+            // Output metrics in Console
             cc.View();
 
             // Output file
