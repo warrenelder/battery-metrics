@@ -8,11 +8,6 @@ namespace batterymetrics.Components
 {
     public class BatteryCycle
     {
-        public BatteryCycle(DeviceFactory deviceFactory)
-        {
-            deviceFactory = new DeviceFactory();
-        }
-
         public static List<Cycle> CalculateDeviceBatteryChargeCycle(int DeviceID)
         {
             List<Cycle> CycleList = new List<Cycle>();
@@ -21,13 +16,14 @@ namespace batterymetrics.Components
                 .DeviceList
                 .Where(x => x.deviceId == DeviceID)
                 .OrderBy(x => x.timestamp)
-                .Select(x => new {
+                .Select(x => new
+                {
                     x.Id,
                     x.timestamp,
                     batteryData = DeviceFactory.ExtractJSON(x).Battery
                 })
                 .ToList();
-            
+
             var DeviceReadingCycleIndex = CreateChargeCycleIndex(DeviceID);
 
             var GroupedDeviceReadingByCycle = DeviceReadings
@@ -45,7 +41,7 @@ namespace batterymetrics.Components
                         .GroupBy(x => x.Cycle)
                         .Select(g => g.ToList())
                 .ToList();
-            
+
             foreach (var CycleGroup in GroupedDeviceReadingByCycle)
             {
                 var FirstReading = CycleGroup.First();
@@ -60,7 +56,7 @@ namespace batterymetrics.Components
             return CycleList;
         }
 
-        private static double TotalBatteryChargingDischargeTime(DateTime t1, DateTime t2, int l1, int l2)
+        public static double TotalBatteryChargingDischargeTime(DateTime t1, DateTime t2, int l1, int l2)
         {
             double DeltaTime = TimeDifference(t2, t1);
             double DeltaLevel = ChargeLevelDifference(l2, l1);
@@ -72,12 +68,12 @@ namespace batterymetrics.Components
             return TotalChargeDischargeTime;
         }
 
-        private static double ChargeLevelDifference(int start, int end)
+        public static double ChargeLevelDifference(int start, int end)
         {
             return Math.Abs(end - start);
         }
 
-        private static double TimeDifference(DateTime start, DateTime end)
+        static double TimeDifference(DateTime start, DateTime end)
         {
             return (end - start).TotalSeconds;
         }
