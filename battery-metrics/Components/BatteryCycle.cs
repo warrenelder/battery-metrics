@@ -49,7 +49,7 @@ namespace batterymetrics.Components
                 CycleList.Add(new Cycle()
                 {
                     Charging = FirstReading.Charging,
-                    PredHalfCycleTime = TotalBatteryChargingDischargeTime(LastReading.Timestamp, FirstReading.Timestamp, LastReading.Level, FirstReading.Level),
+                    PredHalfCycleTime = TotalBatteryChargingDischargeTime(FirstReading.Timestamp, LastReading.Timestamp, FirstReading.Level, LastReading.Level),
                 });
             }
 
@@ -58,8 +58,8 @@ namespace batterymetrics.Components
 
         public static double TotalBatteryChargingDischargeTime(DateTime t1, DateTime t2, int l1, int l2)
         {
-            double DeltaTime = TimeDifference(t2, t1);
-            double DeltaLevel = ChargeLevelDifference(l2, l1);
+            double DeltaTime = TimeDifference(t1, t2);
+            double DeltaLevel = ChargeLevelDifference(l1, l2);
             double TotalChargeDischargeTime = 0;
             if ((DeltaTime > 0) && (DeltaLevel > 0))
             {
@@ -73,7 +73,7 @@ namespace batterymetrics.Components
             return Math.Abs(end - start);
         }
 
-        static double TimeDifference(DateTime start, DateTime end)
+        public static double TimeDifference(DateTime start, DateTime end)
         {
             return (end - start).TotalSeconds;
         }
