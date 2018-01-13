@@ -2,7 +2,7 @@
 using System.IO;
 using batterymetrics.Controller;
 
-namespace battery_metrics
+namespace batterymetrics
 {
     class Program
     {
