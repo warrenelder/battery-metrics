@@ -1,10 +1,9 @@
-﻿using batterymetrics.Utilities;
-using static Newtonsoft.Json.JsonConvert;
-using batterymetrics.Models;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using batterymetrics.Utilities;
+using static Newtonsoft.Json.JsonConvert;
+using batterymetrics.Models;
 
 namespace batterymetrics.Components
 {

@@ -1,5 +1,4 @@
-﻿using System;
-namespace batterymetrics.Models
+﻿namespace batterymetrics.Models
 {
     public class Metric
     {

@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using batterymetrics.Components;
-
 namespace batterymetrics.Controllers
 {
     public class DeviceController : Controller
