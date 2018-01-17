@@ -1,6 +1,6 @@
 ﻿@model batterymetrics.Models.User
 @{
-    ViewData["Title"] = "Send Data";
+    ViewData["Title"] = "Email Battery Metrics";
 }
 <div class="row">
     <div class="col-md-4">
@@ -10,7 +10,15 @@
 
 <div class="row">
     <div class="col-md-4 col-lg-12">
-        <form asp-controller="Home" asp-action="SendEmail" method="post" enctype="multipart/form-data">
+        @if(@ViewData["Message"] != null){
+            <p>@ViewData["Message"]</p>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 col-lg-12">
+        <form asp-controller="Email" asp-action="Email" method="post" enctype="multipart/form-data">
             <div class="form-group inline">
                 <label class="control-label">Email</label>
                 <input asp-for="@Model.Email" class="form-control" />

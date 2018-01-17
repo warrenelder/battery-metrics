@@ -1,6 +1,6 @@
 using System;
 
-namespace battery_metrics.Models
+namespace batterymetrics.Models
 {
     public class ErrorViewModel
     {

@@ -1,18 +1,20 @@
 ﻿using System;
-using static Newtonsoft.Json.JsonConvert;
 namespace batterymetrics.Models
 {
     public class Device
     {
+        private static int DeviceCount = 1;
+
+        public Device()
+        {
+            Id = DeviceCount++;
+        }
+
+        public int Id { get; set; }
         public int deviceId { get; set; }
         public int accntNo { get; set; }
         public DateTime timestamp { get; set; } 
         public string jsonData { get; set; }
-
-        public static DeviceData ExtractJSON(Device item)
-        {
-            return DeserializeObject<DeviceData>(item.jsonData);
-        }
     }
 
     public class DeviceData
@@ -66,6 +68,14 @@ namespace batterymetrics.Models
         public int signalStrength { get; set; }
         public string ssid { get; set; }
         public string macAddress{ get; set; }
+    }
+
+    public class ChargeCycle
+    {
+        public int Cycle { get; set; }
+        public DateTime Timestamp { get; set; } 
+        public int Level { get; set; }
+        public bool Charging { get; set; }
     }
 
 }

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Data Upload";
+    ViewData["Title"] = "Device Data Upload";
 }
 <div class="row">
     <div class="col-md-4">
@@ -9,12 +9,20 @@
 
 <div class="row">
     <div class="col-md-4 col-lg-12">
-        <form asp-controller="Home" asp-action="UploadFile" method="post" enctype="multipart/form-data">
+        @if(@ViewData["Message"] != null){
+            <p>@ViewData["Message"]</p>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 col-lg-12">
+        <form asp-controller="Device" asp-action="FileUpload" method="post" enctype="multipart/form-data">
             <div class="form-group inline">
                 <label class="control-label">File</label>
                 <input name="file" type="file" class="form-control" style="height:auto" />
             </div>
-            <a class="btn btn-primary inline" asp-controller="Home" asp-action="Index">Back</a>
+            <a class="btn btn-primary inline" asp-controller="Device" asp-action="Index">Back</a>
             <input type="submit" value="Upload" class="btn btn-default inline" />
         </form>
     </div>
