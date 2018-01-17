@@ -14,7 +14,7 @@ $ cd /battery-metrics/battery-metrics
 $ dotnet run
 
 The web app can send emails, but the smpt server must be setup. I have utilised Gmail's SmtpClient to send emails.
-To setup go to the *HomeController* and edit the following code;
+To setup go to the *Email Component Class* and edit the following code;
 
 private static SmtpClient smtp = new SmtpClient
 {
