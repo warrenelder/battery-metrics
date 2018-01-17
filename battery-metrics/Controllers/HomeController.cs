@@ -8,15 +8,11 @@ using System.Net;
 using System.Net.Mail;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using batterymetrics.Models;
 using batterymetrics.Components;
-
 namespace batterymetrics.Controllers
 {
     public class HomeController : Controller
     {
-        
         [HttpGet]
         public IActionResult Index()
         {
