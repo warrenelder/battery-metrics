@@ -3,17 +3,28 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using batterymetrics.Components;
+using System.IO;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Hosting;
+
 namespace batterymetrics.Controllers
 {
     public class DeviceController : Controller
     {
+        private IHostingEnvironment hostingEnv;
+
+        public DeviceController(IHostingEnvironment env)
+        {
+            this.hostingEnv = env;
+        }
+
         [Route("/[controller]")]
 
         [HttpGet]
         public IActionResult Index()
         {
             var DeviceList = DeviceFactory.DeviceList.ToList();
-            if(DeviceList.Count() == 0)
+            if (DeviceList.Count() == 0)
             {
                 ViewData["message"] = "No device data is available.";
             }
@@ -41,13 +52,27 @@ namespace batterymetrics.Controllers
 
             if (file == null || file.Length == 0)
             {
-                ViewData["message"] = "No file selected!";   
+                ViewData["message"] = "No file selected!";
             }
             else
             {
                 try
                 {
-                    DeviceFactory.UploadDeviceFromFile(file.FileName);
+                    var filename = ContentDispositionHeaderValue
+                        .Parse(file.ContentDisposition)
+                        .FileName
+                        .Trim('"');
+                    filename = hostingEnv.WebRootPath + $@"\{filename}";
+
+                    using (FileStream fs = System.IO.File.Create(filename))
+                    {
+                        file.CopyTo(fs);
+                        fs.Flush();
+                    }
+
+                    DeviceFactory.UploadDeviceFromFile(filename);
+
+
                     ViewData["message"] = "File uploaded successfully";
                 }
                 catch (Exception ex)
@@ -60,5 +85,3 @@ namespace batterymetrics.Controllers
         }
     }
 }
-
-
