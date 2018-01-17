@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Net.Mail;
 using CsvHelper;
@@ -8,7 +7,7 @@ namespace batterymetrics.Components
     public class Email
     {
 
-        private static SmtpClient smtp = new SmtpClient
+        private static SmtpClient SmtpClient = new SmtpClient
         {
             Host = "smtp.gmail.com",
             Port = 587,
@@ -35,7 +34,7 @@ namespace batterymetrics.Components
                 writer.Flush();
                 stream.Position = 0;
                 message.Attachments.Add(new Attachment(stream, "batterymetrics.csv", "text/csv"));
-                smtp.Send(message);
+                SmtpClient.Send(message);
             }
         }
     }

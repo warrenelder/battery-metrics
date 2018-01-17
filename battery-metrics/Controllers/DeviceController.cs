@@ -13,12 +13,12 @@ namespace batterymetrics.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var _devices = DeviceFactory.DeviceList.ToList();
-            if(_devices.Count() == 0)
+            var DeviceList = DeviceFactory.DeviceList.ToList();
+            if(DeviceList.Count() == 0)
             {
                 ViewData["message"] = "No device data is available.";
             }
-            return View(_devices);
+            return View(DeviceList);
         }
 
         [HttpGet]
