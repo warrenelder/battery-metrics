@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Collections.Generic;
 using CsvHelper;
-using MoreLinq;
 using batterymetrics.Model;
 using batterymetrics.Components;
 
@@ -11,17 +9,11 @@ namespace batterymetrics.Controller
 {
     public class ConsoleController
     {
-        
-        private static List<Metric> DeviceMetricList = new List<Metric>();
-
         public void Read(string filename)
         {
             try
             {
-                foreach( var reading in File.ReadAllLines(filename).Skip(1) )
-                {
-                    DeviceFactory.AddDevice(reading);
-                };
+                DeviceFactory.UploadDeviceFromFile(filename);
             }
             catch (Exception ex)
             {
@@ -33,25 +25,22 @@ namespace batterymetrics.Controller
         {
             Console.Write($"DeviceId  AccNum  BattLife  ChargeT  Cycles  FlatCycles \n");
 
-            foreach (var item in DeviceFactory.DeviceList.DistinctBy(x => x.deviceId).ToList())
+            List<Metric> MetricList = MetricFactory.MetricList;
+            foreach (var item in MetricList)
             {
-                Metric DeviceMetric = MetricFactory.DeviceBatteryMetric(item.deviceId, item.accntNo);
-                string output = $"{DeviceMetric.DeviceId,-10}{DeviceMetric.AccNum,-8}{DeviceMetric.BatteryLifetime,-10}{DeviceMetric.ChargeTime,-9}{DeviceMetric.Cycles,-9}{DeviceMetric.LevelCycles,-8}\n";
+                string output = $"{item.DeviceId,-10}{item.AccNum,-8}{item.BatteryLifetime,-10}{item.ChargeTime,-9}{item.Cycles,-9}{item.LevelCycles,-8}\n";
                 Console.Write(output);
             }
         }
 
         public void Create()
         {
-            foreach (var item in DeviceFactory.DeviceList.DistinctBy(x => x.deviceId).ToList())
-            {
-                DeviceMetricList.Add(MetricFactory.DeviceBatteryMetric(item.deviceId, item.accntNo));
-            }
+            List<Metric> MetricList = MetricFactory.MetricList;
             using (var writer = new StreamWriter("output.csv"))
             {
                 using (var csvWriter = new CsvWriter(writer))
                 {
-                    csvWriter.WriteRecords(DeviceMetricList);
+                    csvWriter.WriteRecords(MetricList);
                 }
             }
         }

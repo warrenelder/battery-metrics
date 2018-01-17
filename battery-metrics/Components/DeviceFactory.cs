@@ -2,6 +2,8 @@
 using static Newtonsoft.Json.JsonConvert;
 using batterymetrics.Model;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace batterymetrics.Components
 {
@@ -12,6 +14,15 @@ namespace batterymetrics.Components
         public static void AddDevice(string reading)
         {
             DeviceList.Add(DeviceParser.FromTsv(reading));
+        }
+
+        public static void UploadDeviceFromFile(string fileName)
+        {
+            foreach (var reading in File.ReadAllLines(fileName).Skip(1))
+            {
+                AddDevice(reading);
+            }
+            MetricFactory.CalculateAllDeviceBatteryMetrics();
         }
 
         public static DeviceData ExtractJSON(Device item)
